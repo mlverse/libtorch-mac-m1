@@ -22,11 +22,11 @@ jobs:
           cd pytorch-build
           cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release \
                 -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
-                -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install -DUSE_MPS=ON ../pytorch
+                -DCMAKE_INSTALL_PREFIX:PATH=../libtorch -DUSE_MPS=ON ../pytorch
           cmake --build . --target install --parallel 8
       - name: Create archive
         run: |
-          cd pytorch-install; zip -r ../libtorch-${{ github.event.inputs.branch }}.zip *
+          zip -r libtorch-${{ github.event.inputs.branch }}.zip libtorch/
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
