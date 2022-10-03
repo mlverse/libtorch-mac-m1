@@ -1,0 +1,27 @@
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        description: The name of the branch you want to build.
+        required: true
+
+name: Build LibTorch
+
+jobs:
+  build:
+    runs-on: ['self-hosted', 'm1']
+    timeout-minutes: 120
+    steps:
+      - name: Clone
+        run: |
+          git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
+      - name: Build Libtorch
+        run: |
+          mkdir pytorch-build
+          cd pytorch-build
+          cmake -DBUILD_SHARED_LIBS:BOOL=ON -DCMAKE_BUILD_TYPE:STRING=Release \
+                -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
+                -DCMAKE_INSTALL_PREFIX:PATH=../pytorch-install -DUSE_MPS=ON ../pytorch
+          cmake --build . --target install --parallel 8
+
