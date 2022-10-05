@@ -21,7 +21,7 @@ jobs:
       - name: Toggle R specific options
         id: options
         run: |
-          if [${{ github.event.inputs.for_r }}] 
+          if ${{ github.event.inputs.for_r }}
           then
             echo "::set-output name=tag_name::LibTorch"
             echo "::set-output name=cmake:: "
