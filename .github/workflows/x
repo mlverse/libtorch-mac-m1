@@ -1,0 +1,11 @@
+cd .. && rm -r pytorch-build && mkdir pytorch-build && cd pytorch-build
+cmake -DBUILD_SHARED_LIBS:BOOL=ON 
+      -DCMAKE_BUILD_TYPE:STRING=Release \
+      -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
+      -DBUILD_PYTHON=false \
+      -DUSE_OPENMP:BOOL=false \
+      -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
+      -DUSE_MPS=ON  \
+      -DUSE_KINETO=OFF \
+      ../pytorch
+cmake --build . --target install --parallel 8
