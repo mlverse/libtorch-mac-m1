@@ -42,7 +42,6 @@ jobs:
             ${{ steps.options.outputs.cmake }}
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             -DUSE_MPS=ON  \
-            -DUSE_KINETO=OFF \
             ../pytorch
           cmake --build . --target install --parallel 8
       # See https://discuss.pytorch.org/t/precompiled-libtorch-for-apple-silicon/162635/7
