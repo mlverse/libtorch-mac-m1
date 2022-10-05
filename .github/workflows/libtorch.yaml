@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir pytorch-build
           cd pytorch-build
-          cmake 
+          cmake \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
