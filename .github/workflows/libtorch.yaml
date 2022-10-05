@@ -7,7 +7,7 @@ on:
         required: true
       for_r:
         type: string
-        required: true 
+        required: true
         description: Wether to build with opinionated options for R.
 
 
