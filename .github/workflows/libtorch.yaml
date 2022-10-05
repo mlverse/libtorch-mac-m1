@@ -23,11 +23,11 @@ jobs:
         run: |
           if ${{ github.event.inputs.for_r }}
           then
-            echo "::set-output name=tag_name::LibTorch"
-            echo "::set-output name=cmake:: "
-          else 
             echo "::set-output name=tag_name::LibTorch-for-R"
             echo "::set-output name=cmake::-DBUILD_PYTHON=OFF -DUSE_OPENMP=OFF -DUSE_KINETO=OFF"
+          else 
+            echo "::set-output name=tag_name::LibTorch"
+            echo "::set-output name=cmake:: "
           fi
       - name: Clone
         run: |
