@@ -1,0 +1,123 @@
+diff --git a/aten/src/ATen/mps/MPSAllocator.h b/aten/src/ATen/mps/MPSAllocator.h
+index ee8712d227..19c73de7d0 100644
+--- a/aten/src/ATen/mps/MPSAllocator.h
++++ b/aten/src/ATen/mps/MPSAllocator.h
+@@ -191,7 +191,7 @@ public:
+                       m_large_pool_shared(m_device, false, true), m_large_pool_private(m_device, false, false),
+                       m_small_pool_shared(m_device, true , true), m_small_pool_private(m_device, true , false),
+                       m_total_allocated_memory(0), m_max_buffer_size([m_device maxBufferLength]),
+-                      m_set_fraction(false), m_enable_debug_info(false) { }
++                      m_set_fraction(true), m_enable_debug_info(false) { }
+ 
+   // interface exposed to at::Allocator
+   id<MTLBuffer> Malloc(size_t size, bool sharedStorage);
+@@ -209,7 +209,7 @@ public:
+ 
+ private:
+   const id<MTLDevice> m_device;
+-  std::mutex m_mutex;
++  std::recursive_mutex m_mutex;
+   // allocated buffers by device pointer
+   ska::flat_hash_map<void*, BufferBlock*> m_allocated_buffers;
+   // unallocated cached buffers larger than 1 MB
+diff --git a/aten/src/ATen/mps/MPSAllocator.mm b/aten/src/ATen/mps/MPSAllocator.mm
+index 2433acbc05..ad09de3664 100644
+--- a/aten/src/ATen/mps/MPSAllocator.mm
++++ b/aten/src/ATen/mps/MPSAllocator.mm
+@@ -46,8 +46,9 @@
+ 
+ bool MPSHeapAllocatorImpl::alloc_buffer(AllocParams& p)
+ {
+-  if (m_set_fraction && m_total_allocated_memory + p.size() > max_available_size())
++  if (m_set_fraction && (m_total_allocated_memory + p.size()) > 1.1*max_available_size()) {
+     return false;
++  }
+ 
+   HeapBlock *heap = get_free_heap(p);
+   if (!heap)
+@@ -100,11 +101,20 @@
+   return true;
+ }
+ 
++bool trigger_callbacks () {
++  for (const auto& name : MPSAllocatorCallbacksRegistry()->Keys()) {
++    MPSAllocatorCallbacksRegistry()->Create(name)->executeMPSAllocatorCallback(
++      nullptr, 
++      IMpsAllocatorCallback::EventType::RELEASED
++    );
++  }
++  return true;
++};
++
+ id<MTLBuffer> MPSHeapAllocatorImpl::Malloc(size_t size, bool sharedStorage)
+ {
+   TORCH_CHECK(size < m_max_buffer_size, "Invalid buffer size: ", format_size(size));
+-
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   size_t alloc_size = get_allocation_size(size, sharedStorage);
+   auto& pool = get_pool(alloc_size, sharedStorage);
+@@ -115,6 +125,8 @@
+       get_free_buffer(params) ||
+       // Attempt allocate
+       alloc_buffer(params) ||
++      // Try to release more by calling gc.
++      (trigger_callbacks() && get_free_buffer(params)) ||
+       // Free enough available cached blocks to satisfy alloc and retry alloc.
+       (release_available_cached_buffers(params) && alloc_buffer(params)) ||
+       // Free all non-split cached buffers and retry alloc.
+@@ -154,7 +166,7 @@
+ 
+ bool MPSHeapAllocatorImpl::isSharedBuffer(void* ptr)
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   BufferBlock *buffer_block = get_allocated_buffer_block(ptr);
+   // it's OK for the buffer_block to not exist yet
+@@ -163,7 +175,7 @@
+ 
+ ssize_t MPSHeapAllocatorImpl::getRequestedBufferSize(void* ptr)
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   BufferBlock *buffer_block = get_allocated_buffer_block(ptr);
+   if (buffer_block)
+@@ -174,7 +186,7 @@
+ 
+ void MPSHeapAllocatorImpl::setBufferShape(void* ptr, const IntArrayRef& shape)
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   BufferBlock *buffer_block = get_allocated_buffer_block(ptr);
+   TORCH_INTERNAL_ASSERT(buffer_block, "failed to find the buffer ", ptr);
+@@ -186,7 +198,7 @@
+ 
+ IntArrayRef MPSHeapAllocatorImpl::getBufferShape(void* ptr)
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   BufferBlock *buffer_block = get_allocated_buffer_block(ptr);
+   if (buffer_block && buffer_block->shape.size() > 0)
+@@ -197,7 +209,7 @@
+ 
+ void MPSHeapAllocatorImpl::Free(void* ptr)
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+ 
+   BufferBlock *buffer_block = get_allocated_buffer_block(ptr);
+   TORCH_INTERNAL_ASSERT(buffer_block);
+@@ -206,7 +218,7 @@
+ 
+ void MPSHeapAllocatorImpl::EmptyCache()
+ {
+-  std::lock_guard<std::mutex> lock(m_mutex);
++  std::lock_guard<std::recursive_mutex> lock(m_mutex);
+   release_cached_buffers();
+ }
+ 
