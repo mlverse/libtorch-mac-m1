@@ -32,7 +32,7 @@ jobs:
           fi
       - name: Clone
         run: |
-          git clone -b tags/${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
+          git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
       - name: Apply patch
         if: ${{ github.event.inputs.for_r == 'true' }}
         run: |
