@@ -26,19 +26,19 @@ jobs:
           then
             echo "::set-output name=tag_name::LibTorch-for-R"
             echo "::set-output name=cmake::-DBUILD_PYTHON=OFF -DUSE_OPENMP=OFF -DUSE_KINETO=OFF"
-          else 
+          else
             echo "::set-output name=tag_name::LibTorch"
             echo "::set-output name=cmake:: "
           fi
       - name: Clone
         run: |
-          git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
+          git clone -b tags/${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
       - name: Apply patch
-        if: ${{ github.event.inputs.for_r == 'true' }} 
+        if: ${{ github.event.inputs.for_r == 'true' }}
         run: |
           ls
           cd pytorch
-          git apply ../patch/MPSAllocator-v1.12.1.patch
+          git apply ../patch/MPSAllocator-${{ github.event.inputs.branch }}.patch
       - name: Build Libtorch
         run: |
           mkdir pytorch-build
@@ -54,7 +54,7 @@ jobs:
           cmake --build . --target install --parallel 8
       # See https://discuss.pytorch.org/t/precompiled-libtorch-for-apple-silicon/162635/7
       - name: Copy libomp.dylib
-        if: ${{ github.event.inputs.for_r != 'true' }} 
+        if: ${{ github.event.inputs.for_r != 'true' }}
         run: |
           cp /opt/homebrew/lib/libomp.dylib libtorch/lib/libomp.dylib
       - name: Create archive
