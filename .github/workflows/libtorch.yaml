@@ -63,7 +63,7 @@ jobs:
         run: |
           cp /opt/homebrew/lib/libomp.dylib libtorch/lib/libomp.dylib
       - name: Patch search path
-        if: ${{ github.event.inputs.release_name == "OpenMP" }}
+        if: ${{ github.event.inputs.release_name == 'OpenMP' }}
         run: |
           install_name_tool -change /opt/homebrew/opt/libomp/lib/libomp.dylib @rpath/libomp.dylib libtorch/lib/libtorch.dylib
       - name: Create archive
