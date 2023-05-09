@@ -65,7 +65,7 @@ jobs:
       - name: Patch search path
         if: ${{ github.event.inputs.release_name == 'OpenMP' }}
         run: |
-          install_name_tool -change /opt/homebrew/opt/libomp/lib/libomp.dylib @rpath/libomp.dylib libtorch/lib/libtorch.dylib
+          install_name_tool -change /opt/homebrew/opt/libomp/lib/libomp.dylib @rpath/libomp.dylib libtorch/lib/libtorch_cpu.dylib
       - name: Create archive
         run: |
           zip -r libtorch-${{ github.event.inputs.branch }}.zip libtorch/
