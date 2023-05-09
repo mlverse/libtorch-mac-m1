@@ -9,6 +9,11 @@ on:
         type: string
         required: true
         description: Wether to build with opinionated options for R.
+      release_name:
+        type: string
+        required: false
+        default: ""
+        description: The release name to output to.
 
 
 name: Build LibTorch
@@ -27,7 +32,7 @@ jobs:
             echo "::set-output name=tag_name::LibTorch-for-R"
             echo "::set-output name=cmake::-DBUILD_PYTHON=OFF -DUSE_OPENMP=OFF -DUSE_KINETO=OFF"
           else
-            echo "::set-output name=tag_name::LibTorch"
+            echo "::set-output name=tag_name::LibTorch${{ github.event.inputs.release_name }}"
             echo "::set-output name=cmake:: "
           fi
       - name: Clone
@@ -57,6 +62,10 @@ jobs:
         if: ${{ github.event.inputs.for_r != 'true' }}
         run: |
           cp /opt/homebrew/lib/libomp.dylib libtorch/lib/libomp.dylib
+      - name: Patch search path
+        if: ${{ github.event.inputs.release_name == "OpenMP" }}
+        run: |
+          install_name_tool -change /opt/homebrew/opt/libomp/lib/libomp.dylib @rpath/libomp.dylib libtorch/lib/libtorch.dylib
       - name: Create archive
         run: |
           zip -r libtorch-${{ github.event.inputs.branch }}.zip libtorch/
