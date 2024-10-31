@@ -46,7 +46,7 @@ jobs:
           cmake --build . --target install --parallel 8
       - name: Create archive
         run: |
-          zip -r libtorch-${{ github.event.inputs.branch }}.zip libtorch/
+          zip -r libtorch-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
