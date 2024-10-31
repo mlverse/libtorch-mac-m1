@@ -12,11 +12,6 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
-      - name: Toggle R specific options
-        id: options
-        run: |
-            echo "::set-output name=tag_name::LibTorch-for-R"
-            echo "::set-output name=cmake::-DBUILD_PYTHON=OFF -DUSE_OPENMP=OFF -DUSE_KINETO=OFF -DUSE_CUDA=OFF -DUSE_XPU=OFF"
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
