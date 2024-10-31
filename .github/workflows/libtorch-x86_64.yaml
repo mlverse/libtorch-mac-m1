@@ -30,7 +30,6 @@ jobs:
           cmake \
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_BUILD_TYPE:STRING=Release \
-            -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
             -DBUILD_PYTHON=OFF \
             -DUSE_OPENMP=OFF \
             -DUSE_KINETO=OFF \
