@@ -17,6 +17,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: "3.30.5"
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
