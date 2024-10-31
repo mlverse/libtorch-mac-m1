@@ -1,0 +1,51 @@
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        description: The name of the branch you want to build.
+        required: true
+
+jobs:
+  build:
+    runs-on: ['macos-latest']
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v3
+      - name: Toggle R specific options
+        id: options
+        run: |
+            echo "::set-output name=tag_name::LibTorch-for-R"
+            echo "::set-output name=cmake::-DBUILD_PYTHON=OFF -DUSE_OPENMP=OFF -DUSE_KINETO=OFF -DUSE_CUDA=OFF -DUSE_XPU=OFF"
+      - name: Clone
+        run: |
+          git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
+      - name: Build Libtorch
+        run: |
+          mkdir pytorch-build
+          cd pytorch-build
+          cmake \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DCMAKE_BUILD_TYPE:STRING=Release \
+            -DPYTHON_EXECUTABLE:PATH=/Users/dfalbel/opt/miniconda3/bin/python3 \
+            -DBUILD_PYTHON=OFF \
+            -DUSE_OPENMP=OFF \
+            -DUSE_KINETO=OFF \
+            -DUSE_CUDA=OFF \
+            -DUSE_XPU=OFF \
+            -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
+            -DUSE_MPS=OFF  \
+            -CMAKE_OSX_ARCHITECTURES=x86_64 \
+            ../pytorch
+          cmake --build . --target install --parallel 8
+      - name: Create archive
+        run: |
+          zip -r libtorch-${{ github.event.inputs.branch }}.zip libtorch/
+      - uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: libtorch-x86_64-${{ github.event.inputs.branch }}.zip
+          overwrite: true
+          file_glob: true
+          tag: LibTorch-for-R
+
