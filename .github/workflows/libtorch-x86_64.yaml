@@ -1,3 +1,5 @@
+name: LibTorch Mac x86_64
+
 on:
   workflow_dispatch:
     inputs:
