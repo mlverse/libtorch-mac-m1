@@ -22,13 +22,17 @@ jobs:
         run: |
           conda install cmake ninja python git
       - name: Clone
+        shell: bash -el {0}
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
-      - run: | 
+      - name: Install deps
+        shell: bash -el {0}
+        run: | 
           cd pytorch
           pip install -r requirements.txt
           pip install mkl-static mkl-include
       - name: Build Libtorch
+        shell: bash -el {0}
         run: |
           mkdir pytorch-build
           cd pytorch-build
@@ -41,6 +45,7 @@ jobs:
             ../pytorch
           cmake --build . --target install --parallel 8
       - name: Create archive
+        shell: bash -el {0}
         run: |
           zip -r libtorch-linux-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
       - uses: svenstaro/upload-release-action@v2
