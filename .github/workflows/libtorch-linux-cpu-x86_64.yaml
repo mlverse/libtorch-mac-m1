@@ -27,7 +27,7 @@ jobs:
           activate-environment: pytorch
       - name: Conda deps
         run: |
-          conda install cmake ninja python git
+          conda install cmake ninja python git zip
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
