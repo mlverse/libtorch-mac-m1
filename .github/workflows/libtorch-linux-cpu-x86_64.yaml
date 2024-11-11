@@ -15,15 +15,12 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: pytorch
       - name: Conda deps
         run: |
-          conda install cmake ninja
+          conda install cmake ninja python==3.13
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
