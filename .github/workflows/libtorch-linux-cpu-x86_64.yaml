@@ -1,4 +1,4 @@
-name: LibTorch Mac x86_64
+name: LibTorch Linux x86_64
 
 on:
   workflow_dispatch:
