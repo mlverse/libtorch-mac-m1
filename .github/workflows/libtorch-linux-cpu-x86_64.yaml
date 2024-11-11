@@ -47,7 +47,7 @@ jobs:
             -DUSE_CUDA=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
-          cmake --build . --target install --parallel 8
+          cmake --build . --target install --parallel 4
       - name: Create archive
         run: |
           zip -r libtorch-linux-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
