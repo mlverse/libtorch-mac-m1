@@ -10,12 +10,18 @@ on:
 
 jobs:
   build:
-    runs-on: ['self-hosted', 'linux', 'x64']
+    runs-on: ${{ matrix.runs }}
     container: ubuntu:20.04
     strategy:
       matrix:
         shared: [ON]
         config: ['Debug', 'Release']
+        include:
+          - config: 'Debug'
+            runs: ['self-hosted', 'linux', 'x64']
+            
+          - config: 'Release'
+            runs: 'ubuntu-latest'
     defaults:
       run:
         shell: bash -el {0}
