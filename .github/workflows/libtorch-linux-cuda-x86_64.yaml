@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ['ubuntu-latest']
+    runs-on: ['self-hosted', 'linux', 'x64']
     strategy:
       matrix:
         cuda: ['118', '124']
@@ -60,7 +60,7 @@ jobs:
             -DUSE_CUDA=ON \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
-          cmake --build . --target install --parallel 4
+          cmake --build . --target install --parallel 8
       - name: Create archive
         run: |
           zip -r libtorch-linux-cuda${{ matrix.cuda }}-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
