@@ -10,11 +10,11 @@ on:
 
 jobs:
   build:
-    runs-on: ['ubuntu-latest']
+    runs-on: ['self-hosted', 'linux', 'x64']
     container: ubuntu:20.04
     strategy:
       matrix:
-        shared: [ON, OFF]
+        shared: [ON]
         config: ['Debug', 'Release']
     defaults:
       run:
@@ -50,6 +50,7 @@ jobs:
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
+            ${{ matrix.shared == 'ON' && '\' || '-DUSE_MPS=OFF' }} \
             ../pytorch
           cmake --build . --target install --parallel 4 --config ${{ matrix.config }}
       - name: Create archive
