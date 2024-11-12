@@ -38,6 +38,9 @@ jobs:
       - name: Conda deps
         run: |
           conda install cmake ninja python git zip
+      - name: Install MAGMA
+        run: |
+          conda install -c pytorch magma-cuda${{ matrix.cuda }}
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
@@ -54,7 +57,7 @@ jobs:
             -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DBUILD_PYTHON=OFF \
-            -DUSE_CUDA=OFF \
+            -DUSE_CUDA=ON \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
           cmake --build . --target install --parallel 4
