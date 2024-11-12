@@ -14,12 +14,12 @@ jobs:
     strategy:
       matrix:
         cuda: ['118', '124']
-      include:
-        - cuda: '118'
-          container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+        include:
+          - cuda: '118'
+            container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 
-        - cuda: '124'
-          container: nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
+          - cuda: '124'
+            container: nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
 
     container: ${{ matrix.container }}
     defaults:
