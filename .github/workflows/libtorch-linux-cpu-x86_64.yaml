@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         shared: [ON, OFF]
+        config: ['Debug', 'Release']
     defaults:
       run:
         shell: bash -el {0}
@@ -45,19 +46,19 @@ jobs:
           cd pytorch-build
           cmake \
             -DBUILD_SHARED_LIBS:BOOL=${{ matrix.shared }} \
-            -DCMAKE_BUILD_TYPE:STRING=Release \
+            -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
-          cmake --build . --target install --parallel 4
+          cmake --build . --target install --parallel 4 --config ${{ matrix.config }}
       - name: Create archive
         run: |
-          zip -r libtorch-linux-x86_64-${{ matrix.shared == 'ON' && 'shared' || 'static' }}-${{ github.event.inputs.branch }}.zip libtorch/
+          zip -r libtorch-linux-cpu-x86_64-${{ matrix.shared == 'ON' && 'shared' || 'static' }}-${{ matrix.config }}-${{ github.event.inputs.branch }}.zip libtorch/
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: libtorch-linux-x86_64-${{ matrix.shared == 'ON' && 'shared' || 'static' }}-${{ github.event.inputs.branch }}.zip
+          file: libtorch-linux-cpu-x86_64-${{ matrix.shared == 'ON' && 'shared' || 'static' }}-${{ matrix.config }}-${{ github.event.inputs.branch }}.zip
           overwrite: true
           file_glob: true
           tag: LibTorch-for-R
