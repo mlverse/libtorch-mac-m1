@@ -26,7 +26,7 @@ jobs:
     defaults:
       run:
         shell: bash -el {0}
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v3
       - name: Install compilation tools
@@ -55,7 +55,7 @@ jobs:
           mkdir pytorch-build
           cd pytorch-build
           cmake \
-            -DBUILD_SHARED_LIBS:BOOL=ON \
+            -DBUILD_SHARED_LIBS:ON \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=ON \
