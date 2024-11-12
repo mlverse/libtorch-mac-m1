@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         cuda: ['118', '124']
+        config: ['Debug', 'Release']
         include:
           - cuda: '118'
             container: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
@@ -60,14 +61,14 @@ jobs:
             -DUSE_CUDA=ON \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
-          cmake --build . --target install --parallel 8
+          cmake --build . --target install --parallel 8 --config ${{ matrix.config }}
       - name: Create archive
         run: |
-          zip -r libtorch-linux-cuda${{ matrix.cuda }}-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
+          zip -r libtorch-linux-cuda${{ matrix.cuda }}-${{ matrix.config }}-x86_64-${{ github.event.inputs.branch }}.zip libtorch/
       - uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: libtorch-linux-cuda${{ matrix.cuda }}-x86_64-${{ github.event.inputs.branch }}.zip
+          file: libtorch-linux-cuda${{ matrix.cuda }}-${{ matrix.config }}-x86_64-${{ github.event.inputs.branch }}.zip
           overwrite: true
           file_glob: true
           tag: LibTorch-for-R
