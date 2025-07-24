@@ -41,6 +41,7 @@ jobs:
             -DUSE_XPU=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             -DUSE_MPS=OFF  \
+            -DUSE_KLEIDIAI=OFF \
             -DCMAKE_OSX_ARCHITECTURES=x86_64 \
             ../pytorch
           cmake --build . --target install --parallel 8
