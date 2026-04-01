@@ -10,13 +10,13 @@ on:
 
 jobs:
   build:
-    runs-on: ['macos-latest']
+    runs-on: ["macos-latest"]
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1
         with:
@@ -24,7 +24,7 @@ jobs:
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
-      - run: | 
+      - run: |
           cd pytorch
           pip install -r requirements.txt
       - name: Build Libtorch
@@ -41,7 +41,6 @@ jobs:
             -DUSE_XPU=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             -DUSE_MPS=ON  \
-            -DCMAKE_OSX_ARCHITECTURES=arm64 \
             ../pytorch
           cmake --build . --target install --parallel 8
       - name: Create archive
@@ -54,4 +53,3 @@ jobs:
           overwrite: true
           file_glob: true
           tag: LibTorch-for-R
-
