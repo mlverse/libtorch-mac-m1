@@ -29,7 +29,7 @@ jobs:
       - name: Install compilation tools
         run: |
           apt-get update
-          apt-get install -y build-essential
+          apt-get install -y build-essential curl
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: pytorch
