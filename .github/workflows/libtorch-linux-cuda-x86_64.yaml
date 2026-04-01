@@ -38,7 +38,11 @@ jobs:
           conda install cmake ninja python git zip
       - name: Install MAGMA
         run: |
-          conda install -c pytorch magma-cuda${{ matrix.cuda }}
+          curl -OLs https://ossci-linux.s3.us-east-1.amazonaws.com/magma-cuda${{ matrix.cuda }}-2.6.1-1.tar.bz2
+          tar -xjf magma-cuda${{ matrix.cuda }}-2.6.1-1.tar.bz2
+          mkdir -p /usr/local/magma
+          mv include /usr/local/magma/include
+          mv lib /usr/local/magma/lib
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
@@ -50,6 +54,7 @@ jobs:
       - name: Build Libtorch
         env:
           TORCH_CUDA_ARCH_LIST: "6.1;7.0;7.5;8.0;8.6;8.9;9.0+PTX"
+          MAGMA_HOME: /usr/local/magma
         run: |
           mkdir pytorch-build
           cd pytorch-build
