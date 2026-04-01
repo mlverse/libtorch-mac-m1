@@ -63,6 +63,7 @@ jobs:
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=ON \
+            -DUSE_NCCL=OFF \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
           cmake --build . --target install --parallel 8 --config ${{ matrix.config }}
