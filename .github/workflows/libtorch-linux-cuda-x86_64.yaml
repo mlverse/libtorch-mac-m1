@@ -59,7 +59,7 @@ jobs:
           mkdir pytorch-build
           cd pytorch-build
           cmake \
-            -DBUILD_SHARED_LIBS:ON \
+            -DBUILD_SHARED_LIBS:BOOL=ON \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=ON \
