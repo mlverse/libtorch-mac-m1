@@ -55,6 +55,7 @@ jobs:
             -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=OFF \
+            -DUSE_LAPACK=ON \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ${{ matrix.shared == 'ON' && '\' || '-DUSE_MPS=OFF' }} \
             ../pytorch
