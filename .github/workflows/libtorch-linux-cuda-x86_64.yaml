@@ -56,11 +56,11 @@ jobs:
           TORCH_CUDA_ARCH_LIST: "6.1+PTX"
           MAGMA_HOME: /usr/local/magma
         run: |
-          SITE_PACKAGES=$(python -c "import sysconfig; print(sysconfig.get_path('purelib'))")
-          MKL_ROOT=/tmp/mkl
-          mkdir -p "$MKL_ROOT/include" "$MKL_ROOT/lib/intel64"
-          ln -sf "$SITE_PACKAGES"/mkl_include/include/* "$MKL_ROOT/include/"
-          ln -sf "$SITE_PACKAGES"/mkl_static/lib/* "$MKL_ROOT/lib/intel64/"
+          MKL_DIR=$(pip show mkl-static | grep Location | awk '{print $2}')
+          MKL_LIB="$MKL_DIR/mkl_static/lib"
+          MKL_INC="$MKL_DIR/mkl_include/include"
+          echo "MKL lib: $MKL_LIB" && ls "$MKL_LIB" | head -5
+          echo "MKL inc: $MKL_INC" && ls "$MKL_INC" | head -5
           mkdir pytorch-build
           cd pytorch-build
           cmake \
@@ -70,7 +70,8 @@ jobs:
             -DUSE_CUDA=ON \
             -DUSE_NCCL=OFF \
             -DBLAS=MKL \
-            -DINTEL_MKL_DIR=$MKL_ROOT \
+            -DCMAKE_LIBRARY_PATH="$MKL_LIB" \
+            -DCMAKE_INCLUDE_PATH="$MKL_INC" \
             -DMKL_THREADING=SEQ \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
