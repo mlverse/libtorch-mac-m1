@@ -35,7 +35,7 @@ jobs:
           activate-environment: pytorch
       - name: Conda deps
         run: |
-          conda install cmake ninja python git zip openblas-devel
+          conda install cmake ninja python git zip mkl mkl-devel mkl-include
       - name: Install MAGMA
         run: |
           curl -OLs https://ossci-linux.s3.us-east-1.amazonaws.com/magma-cuda${{ matrix.cuda }}-2.6.1-1.tar.bz2
@@ -50,7 +50,6 @@ jobs:
         run: | 
           cd pytorch
           pip install -r requirements.txt
-          pip install mkl-include
       - name: Build Libtorch
         env:
           TORCH_CUDA_ARCH_LIST: "6.1+PTX"
@@ -64,7 +63,7 @@ jobs:
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=ON \
             -DUSE_NCCL=OFF \
-            -DBLAS=OpenBLAS \
+            -DBLAS=MKL \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ../pytorch
           cmake --build . --target install --parallel 8 --config ${{ matrix.config }}
