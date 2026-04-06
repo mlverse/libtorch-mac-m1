@@ -37,7 +37,7 @@ jobs:
           activate-environment: pytorch
       - name: Conda deps
         run: |
-          conda install cmake ninja python git zip
+          conda install cmake ninja python git zip openblas-devel
       - name: Clone
         run: |
           git clone -b ${{ github.event.inputs.branch }} --recurse-submodule https://github.com/pytorch/pytorch.git
@@ -45,7 +45,7 @@ jobs:
         run: | 
           cd pytorch
           pip install -r requirements.txt
-          pip install mkl-static mkl-include
+          pip install mkl-include
       - name: Build Libtorch
         run: |
           mkdir pytorch-build
@@ -55,7 +55,7 @@ jobs:
             -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} \
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=OFF \
-            -DUSE_LAPACK=ON \
+            -DBLAS=OpenBLAS \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ${{ matrix.shared == 'ON' && '\' || '-DUSE_MPS=OFF' }} \
             ../pytorch
