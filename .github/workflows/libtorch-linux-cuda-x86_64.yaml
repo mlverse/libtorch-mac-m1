@@ -35,7 +35,7 @@ jobs:
           activate-environment: pytorch
       - name: Conda deps
         run: |
-          conda install cmake ninja python git zip mkl mkl-devel mkl-include
+          conda install cmake ninja python git zip
       - name: Install MAGMA
         run: |
           curl -OLs https://ossci-linux.s3.us-east-1.amazonaws.com/magma-cuda${{ matrix.cuda }}-2.6.1-1.tar.bz2
@@ -50,11 +50,15 @@ jobs:
         run: | 
           cd pytorch
           pip install -r requirements.txt
+          pip install mkl-static mkl-include
       - name: Build Libtorch
         env:
           TORCH_CUDA_ARCH_LIST: "6.1+PTX"
           MAGMA_HOME: /usr/local/magma
         run: |
+          SITE_PACKAGES=$(python -c "import sysconfig; print(sysconfig.get_path('purelib'))")
+          export CMAKE_INCLUDE_PATH="$SITE_PACKAGES/mkl_include/include"
+          export CMAKE_LIBRARY_PATH="$SITE_PACKAGES/mkl_static/lib"
           mkdir pytorch-build
           cd pytorch-build
           cmake \
