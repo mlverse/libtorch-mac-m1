@@ -48,11 +48,7 @@ jobs:
           pip install mkl-static mkl-include
       - name: Build Libtorch
         run: |
-          MKL_DIR=$(pip show mkl-static | grep Location | awk '{print $2}')
-          MKL_LIB="$MKL_DIR/mkl_static/lib"
-          MKL_INC="$MKL_DIR/mkl_include/include"
-          echo "MKL lib: $MKL_LIB" && ls "$MKL_LIB" | head -5
-          echo "MKL inc: $MKL_INC" && ls "$MKL_INC" | head -5
+          ln -s "$CONDA_PREFIX/lib" "$CONDA_PREFIX/lib/intel64"
           mkdir pytorch-build
           cd pytorch-build
           cmake \
@@ -61,8 +57,7 @@ jobs:
             -DBUILD_PYTHON=OFF \
             -DUSE_CUDA=OFF \
             -DBLAS=MKL \
-            -DCMAKE_LIBRARY_PATH="$MKL_LIB" \
-            -DCMAKE_INCLUDE_PATH="$MKL_INC" \
+            -DINTEL_MKL_DIR=$CONDA_PREFIX \
             -DMKL_THREADING=SEQ \
             -DCMAKE_INSTALL_PREFIX:PATH=../libtorch \
             ${{ matrix.shared == 'ON' && '\' || '-DUSE_MPS=OFF' }} \
