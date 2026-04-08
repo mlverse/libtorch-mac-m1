@@ -13,11 +13,13 @@ jobs:
     runs-on: ['ubuntu-latest']
     strategy:
       matrix:
-        cuda: ['128']
+        cuda: ['128', '129']
         config: ['Debug', 'Release']
         include:
           - cuda: '128'
             container: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
+          - cuda: '129'
+            container: nvidia/cuda:12.9.0-cudnn-devel-ubuntu22.04
 
     container: ${{ matrix.container }}
     defaults:
